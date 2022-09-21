@@ -192,6 +192,7 @@ public class HollowMovementScript : MonoBehaviour
             //Attack Side
             if (yAxis == 0 || yAxis < 0 && Grounded())
             {
+                CheckFlip();
                 rb.velocity = new Vector2(MoveDirection * attackStepVelocity, rb.velocity.y);
 
                 anim.SetTrigger("Attack Side");
