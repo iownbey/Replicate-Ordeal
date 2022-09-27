@@ -192,7 +192,7 @@ public class HollowMovementScript : MonoBehaviour
         // Freeze position for air attacks;
         if (attacking && lastAttackLanded)
         {
-            rb.velocity = Vector2.zero;
+            
             rb.gravityScale = gravity * airAttackGravityMultiplier;
         }
         else
@@ -216,6 +216,10 @@ public class HollowMovementScript : MonoBehaviour
                 lastAttackWasAirAttack = !Grounded();
                 if (lastAttackLanded)
                 {
+                    if (lastAttackWasAirAttack)
+                    {
+                        rb.velocity = Vector2.zero;
+                    }
                     pState.recoilingX = true;
                 }
                 for (int i = 0; i < objectsToHit.Length; i++)
