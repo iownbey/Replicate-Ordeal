@@ -30,6 +30,7 @@ public class HollowMovementScript : MonoBehaviour
     [Space(5)]
 
     [Header("Attacking")]
+    [SerializeField] float airAttackGravityMultiplier = 0.1f;
     [SerializeField] float timeBetweenAttack = 0.4f;
     [SerializeField] float attackDuration = 0.5f;
     [SerializeField] Transform attackTransform; // this should be a transform childed to the player but to the right of them, where they attack from.
@@ -72,6 +73,8 @@ public class HollowMovementScript : MonoBehaviour
     int stepsYRecoiled;
     int stepsJumped = 0;
     bool attacking = false;
+    bool lastAttackLanded = false;
+    bool lastAttackWasAirAttack = false;
 
     Rigidbody2D rb;
     [SerializeField] Animator anim;
@@ -185,6 +188,18 @@ public class HollowMovementScript : MonoBehaviour
         timeSinceAttack += Time.deltaTime;
         attacking = timeSinceAttack <= attackDuration;
         bool cooldownFinished = timeSinceAttack >= timeBetweenAttack;
+
+        // Freeze position for air attacks;
+        if (attacking && lastAttackLanded)
+        {
+            rb.velocity = Vector2.zero;
+            rb.gravityScale = gravity * airAttackGravityMultiplier;
+        }
+        else
+        {
+            rb.gravityScale = gravity;
+        }
+
         if (Input.GetButtonDown("Attack") && cooldownFinished)
         {
             timeSinceAttack = 0;
@@ -197,7 +212,9 @@ public class HollowMovementScript : MonoBehaviour
 
                 anim.SetTrigger("Attack Side");
                 Collider2D[] objectsToHit = Physics2D.OverlapCircleAll(attackTransform.position, attackRadius, attackableLayer);
-                if (objectsToHit.Length > 0)
+                lastAttackLanded = objectsToHit.Length > 0;
+                lastAttackWasAirAttack = !Grounded();
+                if (lastAttackLanded)
                 {
                     pState.recoilingX = true;
                 }
