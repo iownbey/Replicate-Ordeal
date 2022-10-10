@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ReplicantBoss : MonoBehaviour
 {
+    [SerializeField] bool isMaster;
+    
     // Start is called before the first frame update
     void Start()
     {
