@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] CollisionChecker ceilingCheck = new();
     [SerializeField] DodgeHandler dodgeHandler = new();
     [SerializeField] GravityHandler gravityWarper = new();
+
+    [SerializeField] AudioSource footstep;
+    [SerializeField] ParticleSystem footstepParticle;
     
     float facing = 1;
 
@@ -81,6 +84,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void Anim_TriggerStep()
+    {
+        if (groundCheck.Succeeded)
+        {
+            if (footstep != null) footstep.Play();
+            if (footstepParticle != null) footstepParticle.Emit(1);
+        }
+    }
+
     public void OnDrawGizmos()
     {
         attackHandler.OnGizmos();
@@ -111,16 +123,17 @@ public class PlayerController : MonoBehaviour
         {
             if (Jumping) jumpTime += Time.deltaTime;
 
-            bool jump = script.c.Player.Jump.IsPressed();
+            bool startJump = script.c.Player.Jump.WasPressedThisFrame();
+            bool continueJump = script.c.Player.Jump.IsPressed();
 
             //Jumping
-            if (jump && script.groundCheck.Succeeded)
+            if (startJump && script.groundCheck.Succeeded)
             {
                 Jumping = true;
                 jumpTime = 0;
             }
 
-            if (Jumping && !jump)
+            if (Jumping && !continueJump)
             {
                 bool pastMin = jumpTime > minJumpDuration;
                 bool beforeMin = jumpTime <= minJumpDuration;
